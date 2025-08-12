@@ -4,84 +4,54 @@ Django settings for production deployment.
 
 import os
 from pathlib import Path
-from decouple import config
 from .settings import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# Configuration de production
 DEBUG = False
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
-
-# Allow all hosts for production (you can restrict this later)
+# Autoriser tous les hôtes pour le moment (à configurer plus tard)
 ALLOWED_HOSTS = ['*']
 
-# CORS settings for production
+# Configuration CORS pour permettre l'accès depuis Vercel
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend-domain.com",  # Replace with your frontend domain
-    "http://localhost:3000",  # For development
+    "https://client-9ivvs69wl-moussa-bas-projects-5b2e16f9.vercel.app",
+    "https://vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
-# Database configuration for production
+# Autoriser les credentials
+CORS_ALLOW_CREDENTIALS = True
+
+# Configuration de la base de données PostgreSQL pour Railway
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default=5432, cast=int),
+        'NAME': os.environ.get('DB_NAME', 'railway'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
-# Static files configuration
+# Configuration des fichiers statiques
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Security settings
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# Configuration de sécurité
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# SSL/HTTPS settings (uncomment when you have SSL)
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+# Configuration des sessions
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
-# Cloudinary settings
-CLOUDINARY = {
-    'cloud_name': config('CLOUDINARY_CLOUD_NAME'),
-    'api_key': config('CLOUDINARY_API_KEY'),
-    'api_secret': config('CLOUDINARY_API_SECRET'),
-}
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': CLOUDINARY['cloud_name'],
-    'API_KEY': CLOUDINARY['api_key'],
-    'API_SECRET': CLOUDINARY['api_secret'],
-}
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# Email settings for production
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-
-# Celery settings for production
-CELERY_BROKER_URL = config('REDIS_URL')
-CELERY_RESULT_BACKEND = config('REDIS_URL')
-
-# Logging configuration
+# Configuration des logs
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
