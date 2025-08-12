@@ -106,6 +106,11 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
+    # Add additional PostgreSQL options for better compatibility
+    DATABASES['default']['OPTIONS'] = {
+        'client_encoding': 'UTF8',
+        'connect_timeout': 10,
+    }
 else:
     # Development: Use local PostgreSQL or SQLite
     DB_ENGINE = config('DB_ENGINE', default='postgres')

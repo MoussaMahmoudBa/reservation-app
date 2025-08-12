@@ -1,3 +1,4 @@
+# Python 3.11 compatible requirements
 Django==4.2.7
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
@@ -15,3 +16,5 @@ django-extensions==3.2.3
 django-debug-toolbar==4.2.0 
 twilio==9.2.3
 dj-database-url==2.1.0
+psycopg2-binary==2.9.9
+Pillow==10.4.0

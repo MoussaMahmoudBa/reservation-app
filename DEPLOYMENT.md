@@ -1,72 +1,72 @@
-# Guide de Déploiement - Application de Réservation
+# 🚀 Guide de Déploiement - Système de Réservation
 
-Ce guide vous explique comment déployer l'application de réservation sur Netlify (Frontend) et Render.com (Backend).
+## 📋 Prérequis
 
-## 🏗️ Architecture de Déploiement
+- Compte GitHub
+- Compte Render.com (gratuit)
+- Compte Netlify (gratuit)
+- Compte Cloudinary (optionnel, pour les images)
 
-- **Frontend (React.js)**: Netlify
-- **Backend (Django)**: Render.com
-- **Base de données**: PostgreSQL sur Render.com
-- **Stockage de fichiers**: Cloudinary
+## 🔧 1. Déploiement Backend (Render.com)
 
-## 🚀 1. Déploiement Backend sur Render.com
+### Étape 1: Préparer le repository
+1. Assurez-vous que votre code est sur GitHub
+2. Vérifiez que le dossier `server` contient :
+   - `requirements.txt`
+   - `build.sh`
+   - `render.yaml`
+   - `manage.py`
 
-### Étape 1: Créer un compte Render.com
-1. Allez sur [render.com](https://render.com)
-2. Créez un compte ou connectez-vous
-
-### Étape 2: Créer la base de données PostgreSQL
-1. Dans le dashboard Render, cliquez sur "New +"
-2. Sélectionnez "PostgreSQL"
-3. Configurez :
-   - **Name**: `reservation-postgres`
-   - **Database**: `reservation_db`
-   - **User**: `reservation_user`
-   - **Plan**: Free
-4. Cliquez sur "Create Database"
-5. Notez l'URL de connexion (DATABASE_URL)
-
-### Étape 3: Déployer le service Django
-1. Dans le dashboard Render, cliquez sur "New +"
-2. Sélectionnez "Web Service"
+### Étape 2: Créer le service sur Render.com
+1. Connectez-vous à [Render.com](https://render.com)
+2. Cliquez sur "New +" → "Web Service"
 3. Connectez votre repository GitHub
 4. Configurez :
    - **Name**: `reservation-backend`
-   - **Root Directory**: `server`
-   - **Environment**: Python 3
+   - **Environment**: `Python`
    - **Build Command**: `./build.sh`
    - **Start Command**: `gunicorn reservation_project.wsgi:application`
    - **Plan**: Free
 
+### Étape 3: Configurer la base de données
+1. Dans Render.com, allez dans "New +" → "PostgreSQL"
+2. Configurez :
+   - **Name**: `reservation-postgres`
+   - **Database**: `reservation_db`
+   - **User**: `reservation_user`
+   - **Plan**: Free
+3. Notez les informations de connexion
+
 ### Étape 4: Configurer les variables d'environnement
-Dans les paramètres du service, ajoutez ces variables :
+Dans les paramètres du service web, ajoutez :
 
 ```
 SECRET_KEY=your-secret-key-here
 DEBUG=false
-DATABASE_URL=postgres://... (from your PostgreSQL service)
-CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
-CLOUDINARY_API_KEY=your-cloudinary-api-key
-CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+DATABASE_URL=postgres://user:password@host:port/database
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-email-password
+EMAIL_HOST_PASSWORD=your-app-password
 ```
 
 ### Étape 5: Déployer
 1. Cliquez sur "Create Web Service"
 2. Render va automatiquement déployer votre application
-3. Notez l'URL de votre service (ex: `https://reservation-backend.onrender.com`)
+3. Notez l'URL de votre API (ex: `https://your-backend-url.onrender.com`)
 
-## 🌐 2. Déploiement Frontend sur Netlify
+## 🌐 2. Déploiement Frontend (Netlify)
 
-### Étape 1: Créer un compte Netlify
-1. Allez sur [netlify.com](https://netlify.com)
-2. Créez un compte ou connectez-vous
+### Étape 1: Préparer le build
+1. Dans le dossier `client`, vérifiez que `package.json` contient le script de build
+2. Assurez-vous que `vite.config.ts` est configuré pour la production
 
-### Étape 2: Connecter le repository
-1. Cliquez sur "New site from Git"
-2. Connectez votre repository GitHub
-3. Configurez :
+### Étape 2: Créer le site sur Netlify
+1. Connectez-vous à [Netlify.com](https://netlify.com)
+2. Cliquez sur "New site from Git"
+3. Connectez votre repository GitHub
+4. Configurez :
    - **Base directory**: `client`
    - **Build command**: `npm run build`
    - **Publish directory**: `dist`
@@ -143,6 +143,24 @@ CLOUDINARY_API_SECRET=your-api-secret
 2. **Erreur de base de données** : Vérifiez la DATABASE_URL
 3. **Erreur de build** : Vérifiez les logs de build dans Render/Netlify
 4. **Erreur 404** : Vérifiez que les routes sont bien configurées
+
+### Problème PostgreSQL Adapter (Résolu)
+Si vous rencontrez l'erreur "Error loading psycopg2 or psycopg module" :
+
+**Solution appliquée :**
+- Utilisation de Python 3.11.7 (plus stable)
+- psycopg2-binary==2.9.9 (compatible avec Python 3.11)
+- Configuration simplifiée dans build.sh
+- Options de base de données optimisées
+
+**Configuration actuelle :**
+```yaml
+# render.yaml
+PYTHON_VERSION: 3.11.7
+
+# requirements.txt
+psycopg2-binary==2.9.9
+```
 
 ### Logs utiles :
 - Render.com : Dashboard > Votre service > Logs
