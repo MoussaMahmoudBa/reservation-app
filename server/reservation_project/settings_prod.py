@@ -20,6 +20,7 @@ ALLOWED_HOSTS = ['*']
 
 # Configuration CORS pour permettre l'accès depuis Vercel
 CORS_ALLOWED_ORIGINS = [
+    "https://client-84jdcuirb-moussa-bas-projects-5b2e16f9.vercel.app",
     "https://client-9ivvs69wl-moussa-bas-projects-5b2e16f9.vercel.app",
     "https://vercel.app",
     "http://localhost:3000",
