@@ -4,6 +4,7 @@ set -o errexit
 
 # Install dependencies using pip (preferred for this project)
 echo "Installing dependencies with pip..."
+pip install --upgrade pip
 pip install -r requirements.txt
 
 # Collect static files
