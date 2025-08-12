@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +30,11 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=lambda v: [s.strip() for s in v.split(',')])
 
+# Add Render.com domain to allowed hosts
+ALLOWED_HOSTS += [
+    '.onrender.com',
+    '.netlify.app',
+]
 
 # Application definition
 
@@ -92,27 +98,37 @@ WSGI_APPLICATION = 'reservation_project.wsgi.application'
 
 
 # Database
-DB_ENGINE = config('DB_ENGINE', default='postgres')
+# Use DATABASE_URL from environment (Render.com) or fallback to local config
+DATABASE_URL = config('DATABASE_URL', default=None)
 
-if DB_ENGINE == 'postgres':
+if DATABASE_URL:
+    # Production: Use DATABASE_URL from Render.com
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='reservation_db'),
-            'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default='Moussa123'),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default=5433, cast=int),
-        }
+        'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # SQLite fallback (dev mode)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+    # Development: Use local PostgreSQL or SQLite
+    DB_ENGINE = config('DB_ENGINE', default='postgres')
+
+    if DB_ENGINE == 'postgres':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME', default='reservation_db'),
+                'USER': config('DB_USER', default='postgres'),
+                'PASSWORD': config('DB_PASSWORD', default='Moussa123'),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default=5433, cast=int),
+            }
         }
-    }
+    else:
+        # SQLite fallback (dev mode)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 
 # Password validation
@@ -191,7 +207,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    # Production domains
+    "https://your-app-name.netlify.app",
+    "https://your-app-name.onrender.com",
 ]
+
+# Allow all origins in development
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_CREDENTIALS = True
 
