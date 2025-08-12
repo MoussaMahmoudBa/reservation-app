@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'reservation_project.wsgi.application'
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
-    # Production: Use DATABASE_URL from Render.com
+    # Production: Use DATABASE_URL from Render.com with psycopg3
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }

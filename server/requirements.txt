@@ -1,4 +1,4 @@
-# Python 3.11 compatible requirements
+# Python 3.13 compatible requirements with psycopg3
 Django==4.2.7
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
@@ -16,4 +16,5 @@ django-extensions==3.2.3
 django-debug-toolbar==4.2.0 
 twilio==9.2.3
 dj-database-url==2.1.0
+psycopg[binary]
 Pillow==10.4.0
