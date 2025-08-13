@@ -1,7 +1,6 @@
 [build]
-  base = "client"
-  publish = "dist"
-  command = "npm run build"
+  publish = "client/dist"
+  command = "./build.sh"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -12,6 +11,6 @@
   status = 200
 
 [dev]
-  command = "npm run dev"
+  command = "cd client && npm run dev"
   port = 3000
-  publish = "dist" 
+  publish = "client/dist" 
